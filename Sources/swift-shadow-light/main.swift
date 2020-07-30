@@ -92,34 +92,35 @@ func shadow(_ ray: Ray, _ k: Float, _ l: Light) -> Float {
     return max(light, 0.0);
 }
 
-func compute(x: Float, y: Float, z: Float, time: Float) {
+func compute(ray: inout Ray, time: Float) {
 //    var uv = simd_float2(x, y)
 //    uv = uv * 2.0 - 1.0;
 //    uv.y = -uv.y;
     var col = simd_float3(repeating: 0.0);
     
-    var ray = Ray(origin: float3(0.0, 2.0, -4), direction: normalize(float3(x, y, z)));
+//    var ray = Ray(origin: float3(0.0, 2.0, -4), direction: normalize(float3(x, y, z)));
     print("ray origin : \(ray.origin)")
     print("ray direction : \(ray.direction)")
 
     var hit = false;
     for i in 0..<200 {
-        print("raymarching origin[\(i)] : \(ray.origin)")
         let dist = distToScene(ray);
-        print("dist : \(dist)")
+//        print("dist : \(dist)")
         if (dist < 0.001) {
             print("hit")
             hit = true;
             break;
         }
         ray.origin += ray.direction * dist;
+        print("raymarching origin[\(i)] : \(ray.origin)")
     }
     col = float3(repeating: 1.0);
     if (!hit) {
         col = simd_float3(0.8, 0.5, 0.5);
     } else {
         let n = getNormal(ray);
-        let light = Light(position: simd_float3(0, 6.0, 8.0));
+        print("normal : \(n)")
+        let light = Light(position: simd_float3(0, 4.0, -4.0));
 //        var light = Light(position: simd_float3(sin(time) * 10.0, 5.0, cos(time) * 10.0));
         let l = lighting(ray, n, light);
         let s = shadow(ray, 0.3, light);
@@ -139,4 +140,9 @@ func compute(x: Float, y: Float, z: Float, time: Float) {
     print("final color : \(col)")
 }
 
-compute(x: 0, y: sqrt(3), z: 3, time: 0)
+var ray = Ray(origin: float3(0.0, 1.9, -2.1), direction: normalize(float3(0, 1, 1)));
+//var ray = Ray(origin: float3(0.0, 2.0, -4), direction: normalize(float3(0, sqrt(3), 3)));
+//compute(x: 0, y: sqrt(3), z: 3, time: 0)
+compute(ray: &ray, time: 0)
+
+print(reflect(float3(-1, -1, 0), n: float3(0, 1, 0)))
